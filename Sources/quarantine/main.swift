@@ -26,12 +26,22 @@ struct quarantine: ParsableCommand {
         completion: .file())
     var statusPath: String?
     
+    @Option(
+        help: "The agent name to use when quarantining a file"
+    )
+    var agentName: String?
     
     func run() throws {
         if let quarantinePath = quarantinePath {
             var url = URL(fileURLWithPath: quarantinePath)
             var resourceValues = URLResourceValues()
-            resourceValues.quarantineProperties = [:]
+            var quarantineProperties: [String: Any] = [:]
+            
+            if let agentName = agentName {
+                quarantineProperties[kLSQuarantineAgentNameKey as String] = agentName
+            }
+            
+            resourceValues.quarantineProperties = quarantineProperties
             try url.setResourceValues(resourceValues)
             print("Quarantined file \(quarantinePath)")
         }
