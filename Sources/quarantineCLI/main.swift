@@ -1,7 +1,7 @@
 import ArgumentParser
 import Foundation
 
-struct quarantine: ParsableCommand {
+struct quarantineCLI: ParsableCommand {
     static var configuration: CommandConfiguration = CommandConfiguration(abstract: "A Command line tool to quarantine and de-quarantine files on macOS")
     /// The path to quarantine (if specified)
     @Option(
@@ -28,7 +28,7 @@ struct quarantine: ParsableCommand {
     @Option(
         help: "The agent name to specify when quarantining a file (optional)"
     )
-    var agentName: String?
+    var agentName: String = "quarantineCLI"
     
     @Option(
         help: "The URL of the resource originally hosting the quarantined file (optional)"
@@ -41,17 +41,14 @@ struct quarantine: ParsableCommand {
             var resourceValues = URLResourceValues()
             var quarantineProperties: [String: Any] = [:]
             
-            if let agentName = agentName {
-                quarantineProperties[kLSQuarantineAgentNameKey as String] = agentName
-            }
-            
+            quarantineProperties[kLSQuarantineAgentNameKey as String] = agentName
             if let originURL = originURL {
                 quarantineProperties[kLSQuarantineOriginURLKey as String] = originURL
             }
             
             resourceValues.quarantineProperties = quarantineProperties
             try url.setResourceValues(resourceValues)
-            print("Quarantined file \(quarantinePath)")
+            print("Quarantined \(quarantinePath)")
         }
         
         if let dequarantinePath = dequarantinePath {
@@ -59,7 +56,7 @@ struct quarantine: ParsableCommand {
             var resourceValues = URLResourceValues()
             resourceValues.quarantineProperties = nil
             try url.setResourceValues(resourceValues)
-            print("De-quarantined file \(dequarantinePath)")
+            print("De-quarantined \(dequarantinePath)")
         }
         
         if let statusPath = statusPath {
@@ -80,4 +77,4 @@ struct quarantine: ParsableCommand {
     }
 }
 
-quarantine.main()
+quarantineCLI.main()
