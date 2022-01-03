@@ -2,7 +2,6 @@ import ArgumentParser
 import Foundation
 
 struct quarantine: ParsableCommand {
-    
     static var configuration: CommandConfiguration = CommandConfiguration(abstract: "A Command line tool to quarantine and de-quarantine files on macOS")
     /// The path to quarantine (if specified)
     @Option(
@@ -27,9 +26,14 @@ struct quarantine: ParsableCommand {
     var statusPath: String?
     
     @Option(
-        help: "The agent name to use when quarantining a file"
+        help: "The agent name to specify when quarantining a file (optional)"
     )
     var agentName: String?
+    
+    @Option(
+        help: "The URL of the resource originally hosting the quarantined file (optional)"
+    )
+    var originURL: String?
     
     func run() throws {
         if let quarantinePath = quarantinePath {
@@ -39,6 +43,10 @@ struct quarantine: ParsableCommand {
             
             if let agentName = agentName {
                 quarantineProperties[kLSQuarantineAgentNameKey as String] = agentName
+            }
+            
+            if let originURL = originURL {
+                quarantineProperties[kLSQuarantineOriginURLKey as String] = originURL
             }
             
             resourceValues.quarantineProperties = quarantineProperties
