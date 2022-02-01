@@ -2,7 +2,7 @@ import ArgumentParser
 import Foundation
 
 struct quarantineCLI: ParsableCommand {
-    static var configuration: CommandConfiguration = CommandConfiguration(abstract: "A Command line tool to quarantine and de-quarantine files on macOS")
+    static var configuration: CommandConfiguration = CommandConfiguration(commandName: "quarantinecli", abstract: "A Command line tool to quarantine and de-quarantine files on macOS")
     /// The path to quarantine (if specified)
     @Option(
         name: [.customLong("quarantine"), .customShort("q")],
@@ -26,14 +26,24 @@ struct quarantineCLI: ParsableCommand {
     var statusPath: String?
     
     @Option(
-        help: "The agent name to specify when quarantining a file (optional)"
+        help: "The agent name to specify when quarantining a file"
     )
     var agentName: String = "quarantineCLI"
+    
+    @Option(
+        help: "The Agent Bundle Identifier to set when quarantine a file (optional)"
+    )
+    var bundleId: String?
     
     @Option(
         help: "The URL of the resource originally hosting the quarantined file (optional)"
     )
     var originURL: String?
+    
+    @Option(
+        help: "The actual URL of the quarantined item (optional)"
+    )
+    var itemURL: String?
     
     func run() throws {
         if let quarantinePath = quarantinePath {
@@ -44,6 +54,14 @@ struct quarantineCLI: ParsableCommand {
             quarantineProperties[kLSQuarantineAgentNameKey as String] = agentName
             if let originURL = originURL {
                 quarantineProperties[kLSQuarantineOriginURLKey as String] = originURL
+            }
+            
+            if let bundleId = bundleId {
+                quarantineProperties[kLSQuarantineAgentBundleIdentifierKey as String] = bundleId
+            }
+            
+            if let itemURL = itemURL {
+                quarantineProperties[kLSQuarantineDataURLKey as String] = itemURL
             }
             
             resourceValues.quarantineProperties = quarantineProperties
